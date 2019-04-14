@@ -1,0 +1,18 @@
+=====================================
+Changes
+=====================================
+
+Added multiplaction for integers and floats, added division for floats.
+
+Added Boolean type.
+Also added many fType built in functions such as greater than, less than etc.
+
+Added if statements.
+
+Added for loops. - TODO Change from first term type int to some assignement
+
+
+Questions
+1. Global variable with express initialization
+2. Expression Computation
+3. Local variables
