@@ -35,19 +35,19 @@ typeStatement(gvLet(Name, T, Code), unit):-
 
 typeStatement(ifStmnt(B, T, CodeT, CodeF), unit) :-
     typeExp(B, bool),
-    typeExp(CodeT, T),
-    typeExp(CodeF, T),
+    typeCode(CodeT, T),
+    typeCode(CodeF, T),
     bType(T).
 
 typeStatement(forStmnt(int, B, Iter, T, Code), unit) :-
     typeExp(B, bool),
-    typeExp(Code, T),
+    typeCode(Code, T),
     bType(T).
 
 typeStatement(funcDef(Name, Params, T, Code), unit):-
     atom(Name),
     is_list(Params),
-    typeExp(Code, T),
+    typeCode(Code, T),
     bType(T),
     append(Params, T, NewT),
     asserta(func(Name, Params, NewT)).
@@ -63,6 +63,12 @@ typeStatement(gvLetInit(Name, T, Code), unit):-
 /* Code is simply a list of statements. The type is 
     the type of the last statement 
 */
+typeCode([S], T):-typeExp(S, T).
+typeCode([S, S2|Code], T):-
+    typeExp(S,_T),
+    typeCode([S2|Code], T).
+
+
 typeCode([S], T):-typeStatement(S, T).
 typeCode([S, S2|Code], T):-
     typeStatement(S,_T),

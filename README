@@ -11,6 +11,8 @@ Added if statements.
 
 Added for loops. - TODO Change from first term type int to some assignement
 
+Liked typeExp and typeCode so that blocks of exp could be passed into functions and return last type in list.
+TypeExpList returns a curried version.
 
 Questions
 1. Global variable with express initialization

@@ -48,19 +48,24 @@ test(mockedFct, [nondet]) :-
 %My Custom tests - Infer
 % 1. if statement
 test(infer_if_t, [nondet]):-
-    infer([ifStmnt( iLessThen(int, int), T, X, imult(int, int) )], unit), %typeStatement( ifStmnt( iLessThen(int, int), T, X, imult(int, int) ), unit).
+    infer([ifStmnt( iLessThen(int, int), T, [X], [imult(int, int)] )], unit), %typeStatement( ifStmnt( iLessThen(int, int), T, X, imult(int, int) ), unit).
     assertion(T == int).
 
 % 2. for loop test
 test(infer_for, [nondet]):-
-    infer([forStmnt(int, iLessThen(int, int), Iter, T, fplus(float, float))], unit), %typeStatement( forStmnt(int, iLessThen(int, int), Iter, T, fplus(float, float)), unit ).
+    infer([forStmnt(int, iLessThen(int, int), Iter, T, [fplus(float, float)])], unit), %typeStatement( forStmnt(int, iLessThen(int, int), Iter, T, fplus(float, float)), unit ).
     assertion(T == float).
 
 % 3. Function
 test(infer_function, [nondet]) :-
-    infer([funcDef(f, [X, Y], T, iToFloat(iplus(X, Y)))], unit), %typeStatement(funcDef(f3, [X, Y], T, iToFloat(iplus(X, Y))), unit).
+    infer([funcDef(f, [X, Y], T, [iToFloat(iplus(X, Y))])], unit), %typeStatement(funcDef(f3, [X, Y], T, iToFloat(iplus(X, Y))), unit).
     assertion(T == float), assertion(X == int), assertion(Y == int),
     func(f, [int, int], [int, int|float]).
+
+%4. Test a block of code with multiple lines in it in if
+test(infer_if_block, [nondet]) :-
+    typeStatement( ifStmnt( iLessThen(int, int), T, [imult(int, int)], [fmult(float, float), imult(int, int)] ), unit), % typeStatement( ifStmnt( iLessThen(int, int), T, [iplus(int, int)], [fmult(float, float), imult(int, int)] ), unit).
+    assertion(T == int).
 
 
 
