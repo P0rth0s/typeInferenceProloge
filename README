@@ -22,6 +22,8 @@ Added if statements.
 
 Added for loops. - TODO Change from first term type int to some assignement
 
+Added local variables that are deleted after code in IN argument runs.
+
 Linked typeExp and typeCode so that blocks of exp could be passed into functions and return last type in list.
 This was neccessary for for loops since TypeExpList returns a curried version.
 

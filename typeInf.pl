@@ -40,8 +40,9 @@ typeStatement(ifStmnt(B, T, CodeT, CodeF), unit) :-
     bType(T).
 
 typeStatement(forStmnt(VarName, B, Iter, T, Code), unit) :-
-    %gvar(VarName, T1),
-    %typeExp(Iter, T1),
+    gvar(VarName, T1),
+    typeExp(Iter, T1),
+    bType(T1),
     typeExp(B, bool),
     typeCode(Code, T),
     bType(T).
@@ -60,7 +61,7 @@ typeStatement(lvLet(Name, T, Code, In), unit):-
     bType(T),
     asserta(lvar(Name, T)),
     typeCode(In, T1),
-    deleteLVars.
+    deleteLVars().
 
 /* Code is simply a list of statements. The type is 
     the type of the last statement 
@@ -76,7 +77,7 @@ typeCode([S, S2|Code], T):-
     typeStatement(S,_T),
     typeCode([S2|Code], T).
 
-/* Code can either be ([S], T) or ([[S]], T) to represent we can have multiple blocks of code */
+/* Code can either be ([S], T) or ([[S]], T) to represent we can have multiple blocks of code  - maybe get rid of*/
 typeCode([S], T):- typeCode(S, T).
 typeCode([S | S2], T) :-
     typeCode(S, _T),
