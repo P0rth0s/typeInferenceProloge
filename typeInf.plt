@@ -49,62 +49,48 @@ test(mockedFct, [nondet]) :-
 % 1. if statement
 test(infer_if_t, [nondet]):-
     infer([ifStmnt( iLessThen(int, int), T, [X], [imult(int, int)] )], unit), %typeStatement( ifStmnt( iLessThen(int, int), T, X, imult(int, int) ), unit).
-    assertion(T == int).
+    assertion(T == int), assertion(X == int).
 
-% 2. for loop test
+% 2. Fail since both branches of if do not have same type
+test(infer_if_t, [fail]):-
+    infer([ifStmnt( iLessThen(int, int), T, [fmult(float, float)], [imult(int, int)] )], unit). %typeStatement( ifStmnt( iLessThen(int, int), T, fmult(float, float), imult(int, int) ), unit).
+
+% 3. for loop test
 test(infer_for, [nondet]):-
     infer([forStmnt(int, iLessThen(int, int), Iter, T, [fplus(float, float)])], unit), %typeStatement( forStmnt(int, iLessThen(int, int), Iter, T, fplus(float, float)), unit ).
     assertion(T == float).
 
-% 3. Function
+% 4. fail because boolean type not being passed as second arg
+test(infer_for, [fail]):-
+    infer([forStmnt(int, fplus(float, float), Iter, T, [fplus(float, float)])], unit).
+
+% 5. Function
 test(infer_function, [nondet]) :-
     infer([funcDef(f, [X, Y], T, [iToFloat(iplus(X, Y))])], unit), %typeStatement(funcDef(f3, [X, Y], T, iToFloat(iplus(X, Y))), unit).
     assertion(T == float), assertion(X == int), assertion(Y == int),
     func(f, [int, int], [int, int|float]).
 
-%4. Test a block of code with multiple lines in it in if
+%6. Test a block of code with multiple lines in it in if statement's CodeF, confirms typeCode works
 test(infer_if_block, [nondet]) :-
     typeStatement( ifStmnt( iLessThen(int, int), T, [imult(int, int)], [fmult(float, float), imult(int, int)] ), unit), % typeStatement( ifStmnt( iLessThen(int, int), T, [iplus(int, int)], [fmult(float, float), imult(int, int)] ), unit).
     assertion(T == int).
 
+%7. Test Code as a multiline block
+test(infer_code, [nondet]):-
+    infer([ifStmnt( iLessThen(int, int), T, [X], [imult(int, int)] ), forStmnt(int, iLessThen(int, int), Iter, T1, [fplus(float, float)])], unit), %typeStatement( forStmnt(int, iLessThen(int, int), Iter, T, fplus(float, float)), unit ).
+    assertion(T == int), assertion(X == int), assertion(T1 == float).
 
+%8. Code can either be [S] or it can be [[S]], represents blocks of code seperated by ;; per Dr. Dobria's insturctions in readme
+test(infer_blocks_of_code):-
+    infer([[ifStmnt( iLessThen(int, int), T, [X], [imult(int, int)] )], [forStmnt(int, iLessThen(int, int), Iter, T1, [fplus(float, float)])] ], unit),
+    assertion(X == int), assertion(T == int), assertion(T1 = float).
 
-% 4. local variables
+% 9. local variables
+/* */
 test(infer_lvar, [nondet]) :-
-    infer([lvLet(v, T, iplus(X, Y))], unit),
-    assertion(T==int), assertion(X==int), assertion(Y=int),
-    lvar(v,int).
+    infer([lvLet(v, T, int, iplus( typeExp(lvar(v), T), int ))], unit),
+    assertion(T==int), assertion(X==int), assertion(Y=int).
 
-% 5. global variables with initialization
 
-% 6. global function with return statement
-
-% 7.
-
-% 8. expression computation
-
-% 9. code blocks
-
-% 10.
-
-% 11.
-
-% 12.
-
-% 13.
-
-% 14.
-
-% 15.
-
-% 16.
-
-% 17.
-
-% 18.
-
-% 19.
-
-% 20.
 
 :-end_tests(typeInf).

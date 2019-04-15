@@ -1,3 +1,14 @@
+Prolog type Inference
+Harry Deffebach
+6448-5421
+=====================================
+Run
+=====================================
+[typeInf].
+consult("typeInf.plt"), run_tests().
+ 
+All tests should pass. In case of error please make sure you are loading typeInf correctly.
+
 =====================================
 Changes
 =====================================
@@ -11,10 +22,8 @@ Added if statements.
 
 Added for loops. - TODO Change from first term type int to some assignement
 
-Liked typeExp and typeCode so that blocks of exp could be passed into functions and return last type in list.
-TypeExpList returns a curried version.
+Linked typeExp and typeCode so that blocks of exp could be passed into functions and return last type in list.
+This was neccessary for for loops since TypeExpList returns a curried version.
 
-Questions
-1. Global variable with express initialization
-2. Expression Computation
-3. Local variables
+Made it so typeCode could be ([S], T) or ([[S]], T). This represents having multiple blocks of code.
+Ie. (code block) ;; (code block) - as requested in readme todo list

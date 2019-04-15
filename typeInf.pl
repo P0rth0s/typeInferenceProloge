@@ -39,7 +39,9 @@ typeStatement(ifStmnt(B, T, CodeT, CodeF), unit) :-
     typeCode(CodeF, T),
     bType(T).
 
-typeStatement(forStmnt(int, B, Iter, T, Code), unit) :-
+typeStatement(forStmnt(VarName, B, Iter, T, Code), unit) :-
+    %gvar(VarName, T1),
+    %typeExp(Iter, T1),
     typeExp(B, bool),
     typeCode(Code, T),
     bType(T).
@@ -52,13 +54,13 @@ typeStatement(funcDef(Name, Params, T, Code), unit):-
     append(Params, T, NewT),
     asserta(func(Name, Params, NewT)).
 
-/*
-typeStatement(glLet(Name, T, Code), unit):-
-
-typeStatement(gvLetInit(Name, T, Code), unit):-
-    */
-
-
+typeStatement(lvLet(Name, T, Code, In), unit):-
+    atom(Name),
+    typeExp(Code, T),
+    bType(T),
+    asserta(lvar(Name, T)),
+    typeCode(In, T1),
+    deleteLVars.
 
 /* Code is simply a list of statements. The type is 
     the type of the last statement 
@@ -73,6 +75,12 @@ typeCode([S], T):-typeStatement(S, T).
 typeCode([S, S2|Code], T):-
     typeStatement(S,_T),
     typeCode([S2|Code], T).
+
+/* Code can either be ([S], T) or ([[S]], T) to represent we can have multiple blocks of code */
+typeCode([S], T):- typeCode(S, T).
+typeCode([S | S2], T) :-
+    typeCode(S, _T),
+    typeCode(S2, T).
 
 /* top level function */
 infer(Code, T) :-
@@ -112,6 +120,8 @@ bType([H|T]):- bType(H), bType(T).
     Call the predicate deleveGVars() to delete all global 
     variables. Best wy to do this is in your top predicate
 */
+
+deleteLVars():-retractall(lvar), asserta(lvar(_X,_Y):-false()).
 
 deleteGVars():-retractall(gvar), asserta(gvar(_X,_Y):-false()).
 
@@ -158,4 +168,4 @@ functionType(Name, Args) :-
     fType(Name, Args), !. % make deterministic
 
 % This gets wiped out but we have it here to make the linter happy
-% gvar(_, _) :- false().
+% gvar(_, _) :- false(). replaced with making dynamic
