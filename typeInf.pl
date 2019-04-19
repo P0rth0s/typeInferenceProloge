@@ -47,13 +47,20 @@ typeStatement(forStmnt(VarName, B, Iter, T, Code), unit) :-
     typeCode(Code, T),
     bType(T).
 
-typeStatement(funcDef(Name, Params, T, Code), unit):-
+typeStatement(funcDef(Name, Params, NewT, Code), unit):-
+    atom(Name),
+    is_list(Params),
+    typeExpList(Code, T),
+    append(Params, T, NewT),
+    asserta(gvar(Name, NewT)).
+
+%this allows us to pass statements into functions
+typeStatement(funcDef(Name, Params, NewT, Code), unit):-
     atom(Name),
     is_list(Params),
     typeCode(Code, T),
-    bType(T),
     append(Params, T, NewT),
-    asserta(func(Name, Params, NewT)).
+    asserta(gvar(Name, NewT)).
 
 typeStatement(lvLet(Name, T, Code, In), unit):-
     atom(Name),

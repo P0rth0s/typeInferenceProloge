@@ -20,9 +20,9 @@ Also added many fType built in functions such as greater than, less than etc.
 
 Added if statements.
 
-Added for loops. - TODO Change from first term type int to some assignement
+Added for loops. Iter and var must be same type
 
-Added local variables that are deleted after code in IN argument runs.
+Added local variables that are deleted after code in IN argument runs - Delete is broken.
 
 Linked typeExp and typeCode so that blocks of exp could be passed into functions and return last type in list.
 This was neccessary for for loops since TypeExpList returns a curried version.

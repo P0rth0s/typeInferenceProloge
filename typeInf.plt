@@ -74,8 +74,8 @@ test(for_iter_init_diff, [fail]):-
 % 6. Function
 test(infer_function, [nondet]) :-
     infer([funcDef(f, [X, Y], T, [iToFloat(iplus(X, Y))])], unit),
-    assertion(T == float), assertion(X == int), assertion(Y == int),
-    func(f, [int, int], [int, int|float]).
+    assertion(T == [int, int, float]), assertion(X == int), assertion(Y == int),
+    gvar(f, [int, int, float]).
 
 %7. Test a block of code with multiple lines in it in if statement's CodeF, confirms typeCode works
 test(infer_if_block, [nondet]) :-
@@ -110,14 +110,30 @@ test(infer_blocks_of_code, [nondet]):-
     infer([[ifStmnt( iLessThen(int, int), T, [X], [imult(int, int)] )], [gvLet(a, T_init, iplus(int, int)), forStmnt(a, iLessThen(int, int), iplus(int, int), T1, [fplus(float, float)])] ], unit),
     assertion(X == int), assertion(T == int), assertion(T1 = float).
 
-%TODO 13. Test to make sure user defined function can be called from tpeCode block
+%TODO 13. Test to make sure user defined function can be called from theCode block
 test(infer_function, [nondet]) :-
-    infer([funcDef(f, [X, Y], T, [iToFloat(iplus(X, Y))]), func(f, [int, int], [int, int|float]) ], unit), %typeStatement(funcDef(f3, [X, Y], T, iToFloat(iplus(X, Y))), unit).
+    infer([funcDef(f, [X, Y], T, [ iToFloat(iplus(X, Y)) ]), f(X, Y)], unit), %typeStatement(funcDef(f3, [X, Y], T, iToFloat(iplus(X, Y))), unit).
     assertion(T == float), assertion(X == int), assertion(Y == int).
 
-% 14. 
-% 15.
-% 16.
+% 14. Test nested function definitions
+test(nested_function_definition, [nondet]) :-
+    typeStatement(funcDef(f, [int, int], [int, int, float], [ iToFloat(iplus(int, int)) ]), unit),
+    typeStatement(funcDef(f1, [int, int], T1, [ f(X, Y) ]), unit),
+    assertion(X == int), assertion(Y == int), assertion(T1 == [int, int, float]),
+    gvar(f, N).
+
+% 15. function with statement
+test(function_with_statement, [nondet]) :-
+    infer([funcDef(f, [string, string], T, [ ifStmnt( compareStrings(string, string), T1, [string], [string]) ])], unit),
+    assertion(T == [string, string| unit]), assertion(T1 == string).
+
+% 16. Cant use an undefined function
+test(nested_function_definition, [fail]) :-
+    typeStatement(funcDef(a1, [int, int], T1, [ a(X, Y) ]), unit),
+    typeStatement(funcDef(a, [int, int], [int, int, float], [ iToFloat(iplus(int, int)) ]), unit),
+    assertion(X == int), assertion(Y == int), assertion(T1 == [int, int, float]),
+    gvar(f, N).
+
 % 17.
 % 18.
 % 19.
