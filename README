@@ -29,3 +29,13 @@ This was neccessary for for loops since TypeExpList returns a curried version.
 
 Made it so typeCode could be ([S], T) or ([[S]], T). This represents having multiple blocks of code.
 Ie. (code block) ;; (code block) - as requested in readme todo list
+
+=====================================
+Bugs
+=====================================
+Local variables are currently broken
+
+Test on 114 fails cant define a function, then use the function in the same infer block.
+However if we do a typeStatement definition of the function, then another typeStatement
+definition we can use functions. The problem seems to be that the function is not initialized
+when it is called. maybe???

@@ -47,6 +47,15 @@ typeStatement(forStmnt(VarName, B, Iter, T, Code), unit) :-
     typeCode(Code, T),
     bType(T).
 
+%this allows us to pass statements into functions
+typeStatement(funcDef(Name, Params, NewT, Code), unit):-
+    atom(Name),
+    is_list(Params),
+    typeCode(Code, T),
+    append(Params, T, NewT),
+    asserta(gvar(Name, NewT)),
+    !. %Stop so dont match Code with expList below
+
 typeStatement(funcDef(Name, Params, NewT, Code), unit):-
     atom(Name),
     is_list(Params),
@@ -54,14 +63,20 @@ typeStatement(funcDef(Name, Params, NewT, Code), unit):-
     append(Params, T, NewT),
     asserta(gvar(Name, NewT)).
 
-%this allows us to pass statements into functions
-typeStatement(funcDef(Name, Params, NewT, Code), unit):-
+/* 
+pairs_keys_values([X, Y], [a, v], [Z, Z2]).
+X = a-Z,
+Y = v-Z2.
+*/
+typeStatement(lvLet(Name, T, Code, In, Local), unit):-
     atom(Name),
-    is_list(Params),
-    typeCode(Code, T),
-    append(Params, T, NewT),
-    asserta(gvar(Name, NewT)).
+    typeExp(Code, T),
+    bType(T),
+    pairs_keys_values([X], [Name], [T]), %get local variable pair
+    append(X, Local, Local1),
+    typeCode(In, T1, Local1).
 
+%lvar attempt
 typeStatement(lvLet(Name, T, Code, In), unit):-
     atom(Name),
     typeExp(Code, T),

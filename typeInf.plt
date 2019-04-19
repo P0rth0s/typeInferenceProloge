@@ -74,7 +74,7 @@ test(for_iter_init_diff, [fail]):-
 % 6. Function
 test(infer_function, [nondet]) :-
     infer([funcDef(f, [X, Y], T, [iToFloat(iplus(X, Y))])], unit),
-    assertion(T == [int, int, float]), assertion(X == int), assertion(Y == int),
+    assertion(T == [int, int | float]), assertion(X == int), assertion(Y == int),
     gvar(f, [int, int, float]).
 
 %7. Test a block of code with multiple lines in it in if statement's CodeF, confirms typeCode works
@@ -110,16 +110,16 @@ test(infer_blocks_of_code, [nondet]):-
     infer([[ifStmnt( iLessThen(int, int), T, [X], [imult(int, int)] )], [gvLet(a, T_init, iplus(int, int)), forStmnt(a, iLessThen(int, int), iplus(int, int), T1, [fplus(float, float)])] ], unit),
     assertion(X == int), assertion(T == int), assertion(T1 = float).
 
-%TODO 13. Test to make sure user defined function can be called from theCode block
+%TODO 13. Test to make sure user defined function can be called from same infer
 test(infer_function, [nondet]) :-
-    infer([funcDef(f, [X, Y], T, [ iToFloat(iplus(X, Y)) ]), f(X, Y)], unit), %typeStatement(funcDef(f3, [X, Y], T, iToFloat(iplus(X, Y))), unit).
+    infer([funcDef(f6, [X, Y], T, [ iToFloat(iplus(X, Y)) ]), f6(X, Y)], unit),
     assertion(T == float), assertion(X == int), assertion(Y == int).
 
 % 14. Test nested function definitions
 test(nested_function_definition, [nondet]) :-
     typeStatement(funcDef(f, [int, int], [int, int, float], [ iToFloat(iplus(int, int)) ]), unit),
     typeStatement(funcDef(f1, [int, int], T1, [ f(X, Y) ]), unit),
-    assertion(X == int), assertion(Y == int), assertion(T1 == [int, int, float]),
+    assertion(X == int), assertion(Y == int), assertion(T1 == [int, int | float]),
     gvar(f, N).
 
 % 15. function with statement
@@ -128,15 +128,31 @@ test(function_with_statement, [nondet]) :-
     assertion(T == [string, string| unit]), assertion(T1 == string).
 
 % 16. Cant use an undefined function
-test(nested_function_definition, [fail]) :-
+test(nested_function_definition_undef, [fail]) :-
     typeStatement(funcDef(a1, [int, int], T1, [ a(X, Y) ]), unit),
     typeStatement(funcDef(a, [int, int], [int, int, float], [ iToFloat(iplus(int, int)) ]), unit),
     assertion(X == int), assertion(Y == int), assertion(T1 == [int, int, float]),
     gvar(f, N).
 
-% 17.
-% 18.
-% 19.
-% 20.
+% 17. Goes with test 12 Make sure when we pass to infer as [[S]] S can be S | ST
+test(infer_blocks_of_code, [nondet]):-
+    infer([[ifStmnt( iLessThen(int, int), T, [X], [imult(int, int)] ),  ifStmnt( iLessThen(int, int), T, [X], [imult(int, int)])     ], [gvLet(a, T_init, iplus(int, int)), forStmnt(a, iLessThen(int, int), iplus(int, int), T1, [fplus(float, float)])] ], unit),
+    assertion(X == int), assertion(T == int), assertion(T1 = float).
 
+% 18. The readme specifically requested explicit initialization so that is demonstrated here
+test(explicit_var_init, [nondet]) :-
+    infer([gvLet(v, T, int)], unit),
+    assertion(T==int),
+    gvar(v,int).
+
+% 19. Function called within statement
+test(call_function_in_statement, [nondet]) :-
+    typeStatement(funcDef(f, [int, int], [int, int, float], [ iToFloat(iplus(int, int)) ]), unit),
+    typeStatement(ifStmnt( iLessThen(int, int), T, [X], [imult(int, fToInt(f(int, int)))] ), unit),
+    assertion(X == int), assertion(T == int).
+
+% 20. Function def should be able to point towards list
+test( function_def_list, [nondet]) :-
+    typeStatement(funcDef(f, [int, int], X, [ iToFloat(iplus(int, int)), imult(int, int) ]), unit),
+    assertion(X == [int, int | int]).
 :-end_tests(typeInf).
